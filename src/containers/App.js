@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
+import AuthContext from '../context/auth-context'
 
 class App extends Component {
 
@@ -20,7 +21,8 @@ class App extends Component {
     otherState: 'my value uuu',
     showPersons:  false,
     showCockpit: true,
-    changeCounter: 0
+    changeCounter: 0,
+    authenticated: false
   }
 
   static getDerivedStateFromProps(props, state){
@@ -73,6 +75,10 @@ class App extends Component {
     this.setState({showPersons: !doesShow})
   }
 
+  loginHandler = () =>{
+    this.setState({authenticated: true});
+  }
+
   render() {
     console.log('[App.js] render')
     let persons = null;
@@ -81,19 +87,22 @@ class App extends Component {
       persons = <Persons
         persons={this.state.persons}
         clicked={this.deletePersonHandler}
-        changed={this.nameChangeHandler} />;
+        changed={this.nameChangeHandler}
+        isAuthenticated={this.state.authenticated} />;
     }
 
     return ( 
         <div className="App">
           <button onClick={ () => {this.setState({showCockpit : false})}}>Remove cockpit</button> 
+          <AuthContext.Provider value={{authenticated: this.state.authenticated, login: this.loginHandler}}>
           { this.state.showCockpit ? <Cockpit 
             title={this.props.appTitle}
             showPersons ={this.state.showPersons}
             personsLength={this.state.persons.length}
-            clicked={this.togglePersonHandler} /> : null
+            clicked={this.togglePersonHandler}  /> : null
             }
          {persons}
+         </AuthContext.Provider>
         </div>
     );
    // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Ce faci nebunule?'))
